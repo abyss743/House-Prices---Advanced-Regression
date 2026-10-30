@@ -1,82 +1,76 @@
-## House-Prices---Advanced-Regression
-My attempt on the famous Ames Housing dataset
-## 1. Data Loading
-- Loaded the Ames Housing dataset (1,460 rows × 81 columns)
-- Source: Kaggle House Prices - Advanced Regression Techniques
-## 2. Dataset Overview
-- The dataset contains 1,460 houses with 81 features\columns.
-- Mix of numerical and categorical variables.
-- Target variable: 'SalePrice'
-## 3. Target Variable Analysis
-- `SalePrice` is right-skewed.
-- Most houses are priced between $100,000 – $250,000.
-- Log transformation was later applied to make the distribution more normal.
-## 4. Missing Values
-- Several columns had missing values (e.g. PoolQC, MiscFeature, Alley, Fence, FireplaceQu, LotFrontage, etc.).
-- Missing values in many categorical columns actually meant the feature was absent (e.g. no pool, no alley).
-- These were handled later during preprocessing.
-## 5. Correlation Analysis
-- Strongest features correlated with `SalePrice`:
-  - OverallQual (0.79)
-  - GrLivArea (0.71)
-  - GarageCars (0.64)
-  - GarageArea (0.62)
-  - TotalBsmtSF (0.61)
-- These features were prioritized during modeling.
-## 6. Correlation Heatmap
-- Visualized the relationships between the top correlated features.
-- Confirmed strong positive correlations between OverallQual, GrLivArea, GarageCars, and SalePrice.
-## 7. Feature Relationships
-- `OverallQual` shows a clear positive relationship with SalePrice (higher quality → higher price).
-- `GrLivArea` also shows a strong positive relationship, with a few outliers visible.
-## 8. Handling Missing Values
-- Categorical columns where NaN meant “None” (e.g. PoolQC, Alley, Fence) were filled with `'None'`.
-- `LotFrontage` was filled with the median.
-- Other numerical columns were filled with 0.
-- Remaining categorical columns were filled with the mode.
-- Final result: 0 missing values.
-## 9. Log Transformation
-- `SalePrice` was right-skewed.
-- Applied `np.log1p()` transformation to make the distribution more normal.
-- This helped improve model performance.
-## 10. Data Preparation
-- Dropped `Id` and the original `SalePrice`.
-- Used the log-transformed target (`SalePrice_log` / `LogSalePrice`).
-- Prepared baseline features before applying feature engineering.
-## 11. Categorical Encoding
-- Applied One-Hot Encoding using `pd.get_dummies()`.
-- Number of features increased from 79 to 301 after encoding.
-## 12. Train-Validation Split
-- Split the data into 80% training and 20% validation sets.
-- Used `random_state=42` for reproducibility.
-## 13. Baseline Model
-- Trained a Linear Regression model as the baseline.
-- Validation RMSE: **0.13206**
-## 14. Random Forest
-- Trained a Random Forest model with 100 trees.
-- Validation RMSE: **0.14571**
-## 15. XGBoost (Initial)
-- Trained an initial XGBoost model.
-- Validation RMSE: **0.13839**
-## 16. Feature Engineering
-Created the following new features:
+# House Prices - Advanced Regression Techniques
+
+My solution for the classic Ames Housing dataset from Kaggle.
+
+**Final Validation RMSE: 0.1183**
+
+---
+
+## Project Overview
+
+This project predicts house sale prices using the Ames Housing dataset (1,460 houses with 79 explanatory features).
+
+### Key Steps Taken:
+- Exploratory Data Analysis
+- Missing value treatment
+- Feature Engineering
+- Outlier removal
+- Ordinal Encoding
+- Hyperparameter tuning
+- Data leakage detection & fixing
+
+---
+
+## Final Model Performance
+
+| Stage                              | Model     | RMSE    |
+|------------------------------------|-----------|---------|
+| Baseline                           | Linear Regression | 0.13206 |
+| After Feature Engineering          | XGBoost   | 0.13801 |
+| After Outlier Removal              | XGBoost   | 0.12226 |
+| After Hyperparameter Tuning        | XGBoost   | 0.1204  |
+| **After Ordinal Encoding (Final)** | **XGBoost** | **0.1183** |
+
+---
+
+## Key Techniques Used
+
+### 1. Feature Engineering
 - `TotalSF` = TotalBsmtSF + 1stFlrSF + 2ndFlrSF
-- `TotalBath` = FullBath + HalfBath + BsmtFullBath + BsmtHalfBath
-- `HouseAge` = YrSold - YearBuilt
-- `RemodeledAge` = YrSold - YearRemodAdd
-- `IsNew` = whether the house was built in the year it was sold
-## 17. Data Preparation After Feature Engineering
-- Recreated features and target after adding engineered features.
-- Applied One-Hot Encoding again.
-- Split the data into training and validation sets.
-## 18. Data Leakage Detection
-- After feature engineering, Linear Regression produced an unrealistic RMSE of 0.00000.
-- This was caused by a leaked column (`SalePrice_log`) that had a perfect correlation with the target.
-- The issue was investigated and fixed in the following steps.
-## 19. Data Leakage Investigation
-- Checked whether `SalePrice` or `LogSalePrice` were still present in the features.
-- Both were correctly removed.
-- Further investigation (correlation analysis) revealed a leaked column named `SalePrice_log`.
-## 20. Confirming the Leakage
-- Compared the first 10 predictions with the actual values.
-- Predictions matched the target exactly → confirmed data leakage.
+- `TotalBath`
+- `HouseAge`
+- `RemodeledAge`
+- `IsNew`
+
+### 2. Outlier Removal
+Removed 2 clear outliers with very large `GrLivArea` but low `SalePrice`.
+
+### 3. Ordinal Encoding
+Applied ordinal encoding to quality-related features (`ExterQual`, `KitchenQual`, `BsmtQual`, etc.).
+
+### 4. Data Leakage Detection
+During experimentation, a leaked column (`SalePrice_log`) caused an unrealistic RMSE of 0.00000.  
+The issue was identified through correlation analysis and fixed.
+
+---
+
+## Tech Stack
+
+- Python
+- pandas, numpy
+- matplotlib, seaborn
+- scikit-learn
+- XGBoost
+
+---
+
+## How to Run
+
+1. Open the notebook in Google Colab or Jupyter.
+2. Run all cells in order.
+
+---
+
+## Author
+
+Abyss Reverie
